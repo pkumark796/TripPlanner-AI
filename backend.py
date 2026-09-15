@@ -49,24 +49,28 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY:
     raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file.")
 
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+
 
 # =========================
 # LLM
 # =========================
 
 llm = ChatGroq(
-    model="groq/compound-mini",
+    model=GROQ_MODEL,
     api_key=GROQ_API_KEY
 )
 
-def invoke_llm(messages, retries=3, delay=3):
+def invoke_llm(messages, retries=4, delay=5):
     for attempt in range(retries):
         try:
             return llm.invoke(messages)
         except Exception as e:
+            wait_time = delay * (attempt + 1)
             print(f"[invoke_llm] Attempt {attempt + 1} failed: {e}")
             if attempt < retries - 1:
-                time.sleep(delay)
+                print(f"[invoke_llm] Retrying in {wait_time}s...")
+                time.sleep(wait_time)
             else:
                 raise e
 

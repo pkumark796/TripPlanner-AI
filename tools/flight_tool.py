@@ -429,44 +429,28 @@ def format_flight(flight: dict):
 
     dep_airport = dep.get("airport") or "Unknown departure airport"
     dep_iata = dep.get("iata") or "Unknown"
-    dep_terminal = dep.get("terminal") or "N/A"
-    dep_gate = dep.get("gate") or "N/A"
+    dep_terminal = dep.get("terminal")
     dep_scheduled = dep.get("scheduled") or "Unknown"
-    dep_delay = dep.get("delay")
-    dep_delay_text = f"{dep_delay} minutes" if dep_delay is not None else "N/A"
 
     arr_airport = arr.get("airport") or "Unknown arrival airport"
     arr_iata = arr.get("iata") or "Unknown"
-    arr_terminal = arr.get("terminal") or "N/A"
-    arr_gate = arr.get("gate") or "N/A"
+    arr_terminal = arr.get("terminal")
     arr_scheduled = arr.get("scheduled") or "Unknown"
-    arr_delay = arr.get("delay")
-    arr_delay_text = f"{arr_delay} minutes" if arr_delay is not None else "N/A"
 
-    return f"""
-Airline: {airline}
-Flight: {flight_number}
-Status: {status}
+    dep_details = f"- Departure: {dep_airport} ({dep_iata}) at {dep_scheduled}"
+    if dep_terminal:
+        dep_details += f" [Terminal {dep_terminal}]"
 
-Departure:
-- Airport: {dep_airport}
-- IATA: {dep_iata}
-- Terminal: {dep_terminal}
-- Gate: {dep_gate}
-- Scheduled: {dep_scheduled}
-- Delay: {dep_delay_text}
+    arr_details = f"- Arrival: {arr_airport} ({arr_iata}) at {arr_scheduled}"
+    if arr_terminal:
+        arr_details += f" [Terminal {arr_terminal}]"
 
-Arrival:
-- Airport: {arr_airport}
-- IATA: {arr_iata}
-- Terminal: {arr_terminal}
-- Gate: {arr_gate}
-- Scheduled: {arr_scheduled}
-- Delay: {arr_delay_text}
-""".strip()
+    return f"""Flight: {flight_number} ({airline}) | Status: {status}
+{dep_details}
+{arr_details}""".strip()
 
 
-def search_flights(query: str, limit: int = 10):
+def search_flights(query: str, limit: int = 5):
     if not API_KEY:
         return (
             "Flight API error: AVIATIONSTACK_API_KEY is missing.\n"
